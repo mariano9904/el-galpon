@@ -21,9 +21,9 @@ let state = { view:'home', category:null, vehicleId:null, galleryIndex:0 };
 
 async function loadData(){
   const [{data: v}, {data: b}, {data: s}] = await Promise.all([
-    supabase.from('vehicles').select('*').order('created_at', {ascending:false}),
-    supabase.from('brands').select('*').order('orden'),
-    supabase.from('site_settings').select('*').eq('id',1).single()
+    sb.from('vehicles').select('*').order('created_at', {ascending:false}),
+    sb.from('brands').select('*').order('orden'),
+    sb.from('site_settings').select('*').eq('id',1).single()
   ]);
   vehicles = v || [];
   brands = b || [];
