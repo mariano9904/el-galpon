@@ -120,7 +120,7 @@ function renderCategoryGrid(){
   return html;
 }
 function renderCategoryHero(){
-  return `<div class="hero" style="padding:34px 0;"><div class="wrap"><h1 style="font-size:28px;">${esc(state.category)}</h1></div></div>`;
+  return `<div class="hero category-hero"><div class="wrap"><h1>${esc(state.category)}</h1></div></div>`;
 }
 function renderCategoryList(){
   const list = vehicles.filter(v=>v.marca===state.category);
