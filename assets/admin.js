@@ -11,7 +11,7 @@ function esc(str){ const d=document.createElement('div'); d.textContent = str==n
 function fmtMoney(n){ if(n===''||n==null) return 'Consultar precio'; return 'USD ' + Number(n).toLocaleString('es-AR'); }
 
 async function init(){
-  const { data: { session: s } } = await supabase.auth.getSession();
+  const { data: { session: s } } = await sb.auth.getSession();
   session = s;
   if(session) await loadAll();
   render();
@@ -19,9 +19,9 @@ async function init(){
 
 async function loadAll(){
   const [{data: v}, {data: b}, {data: s}] = await Promise.all([
-    supabase.from('vehicles').select('*').order('created_at', {ascending:false}),
-    supabase.from('brands').select('*').order('orden'),
-    supabase.from('site_settings').select('*').eq('id',1).single()
+    sb.from('vehicles').select('*').order('created_at', {ascending:false}),
+    sb.from('brands').select('*').order('orden'),
+    sb.from('site_settings').select('*').eq('id',1).single()
   ]);
   vehicles = v || []; brands = b || []; settings = s || {};
 }
@@ -195,7 +195,7 @@ function bind(){
     document.getElementById('loginBtn').addEventListener('click', async ()=>{
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPw').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if(error){ document.getElementById('loginError').style.display='block'; return; }
       session = data.session;
       await loadAll();
@@ -204,7 +204,7 @@ function bind(){
     return;
   }
   document.getElementById('logoutBtn').addEventListener('click', async ()=>{
-    await supabase.auth.signOut(); session = null; render();
+    await sb.auth.signOut(); session = null; render();
   });
   document.querySelectorAll('.admin-tab').forEach(el=>el.addEventListener('click', ()=>{
     if(el.dataset.tab==='nuevo') state.editingId = null;
@@ -216,12 +216,12 @@ function bind(){
       const id = btn.dataset.id;
       if(btn.dataset.action==='toggle'){
         const v = vehicles.find(t=>t.id===id);
-        await supabase.from('vehicles').update({estado: v.estado==='vendido'?'disponible':'vendido'}).eq('id', id);
+        await sb.from('vehicles').update({estado: v.estado==='vendido'?'disponible':'vendido'}).eq('id', id);
         await loadAll(); render();
       }else if(btn.dataset.action==='delete'){ state.pendingDeleteId = id; render(); }
       else if(btn.dataset.action==='cancel-delete'){ state.pendingDeleteId = null; render(); }
       else if(btn.dataset.action==='confirm-delete'){
-        await supabase.from('vehicles').delete().eq('id', id);
+        await sb.from('vehicles').delete().eq('id', id);
         state.pendingDeleteId = null; await loadAll(); render();
       }else if(btn.dataset.action==='edit'){ state.editingId = id; state.tab='nuevo'; render(); }
     }));
@@ -263,8 +263,8 @@ function bind(){
         fotos
       };
       let error;
-      if(state.editingId) ({error} = await supabase.from('vehicles').update(data).eq('id', state.editingId));
-      else ({error} = await supabase.from('vehicles').insert(data));
+      if(state.editingId) ({error} = await sb.from('vehicles').update(data).eq('id', state.editingId));
+      else ({error} = await sb.from('vehicles').insert(data));
       if(error) alert('No se pudo guardar: ' + error.message);
       state.tab='vehiculos'; state.editingId=null; await loadAll(); render();
     });
@@ -286,7 +286,7 @@ function bind(){
         };
       });
       if(rows.length===0){ alert('Pegá al menos una línea.'); return; }
-      const { error } = await supabase.from('vehicles').insert(rows);
+      const { error } = await sb.from('vehicles').insert(rows);
       if(error) alert('No se pudo cargar: ' + error.message);
       document.getElementById('bulkText').value='';
       state.tab='vehiculos'; await loadAll(); render();
@@ -297,7 +297,7 @@ function bind(){
     document.getElementById('addBrandBtn').addEventListener('click', async ()=>{
       const input = document.getElementById('new-brand-input');
       const name = input.value.trim(); if(!name) return;
-      const { error } = await supabase.from('brands').insert({nombre: name, orden: brands.length+1});
+      const { error } = await sb.from('brands').insert({nombre: name, orden: brands.length+1});
       if(error) alert('No se pudo agregar: ' + error.message);
       await loadAll(); render();
     });
@@ -306,7 +306,7 @@ function bind(){
         const file = inp.files[0]; if(!file) return;
         try{
           const url = await uploadToBucket(file, 'marcas');
-          await supabase.from('brands').update({logo_url:url}).eq('id', inp.dataset.id);
+          await sb.from('brands').update({logo_url:url}).eq('id', inp.dataset.id);
           await loadAll(); render();
         }catch(e){ alert('Error al subir el logo'); }
       });
@@ -316,7 +316,7 @@ function bind(){
       if(btn.dataset.action==='remove-brand'){ state.pendingDeleteBrand = id; render(); }
       else if(btn.dataset.action==='cancel-remove-brand'){ state.pendingDeleteBrand = null; render(); }
       else if(btn.dataset.action==='confirm-remove-brand'){
-        await supabase.from('brands').delete().eq('id', id);
+        await sb.from('brands').delete().eq('id', id);
         state.pendingDeleteBrand = null; await loadAll(); render();
       }
     }));
@@ -329,7 +329,7 @@ function bind(){
       preview.textContent = 'Subiendo…';
       try{
         const url = await uploadToBucket(file, 'hero');
-        await supabase.from('site_settings').update({hero_image_url:url}).eq('id',1);
+        await sb.from('site_settings').update({hero_image_url:url}).eq('id',1);
         preview.style.backgroundImage = `url('${url}')`; preview.textContent = '';
         await loadAll();
       }catch(e){ preview.textContent = 'Error'; }
@@ -340,7 +340,7 @@ function bind(){
       status.textContent = 'Subiendo…';
       try{
         const url = await uploadToBucket(file, 'pdf');
-        await supabase.from('site_settings').update({trailer_pdf_url:url}).eq('id',1);
+        await sb.from('site_settings').update({trailer_pdf_url:url}).eq('id',1);
         status.textContent = '✓ Cargado';
         await loadAll();
       }catch(e){ status.textContent = 'Error al subir'; }
@@ -355,7 +355,7 @@ function bind(){
         instagram: document.getElementById('s-ig').value.trim(),
         facebook: document.getElementById('s-fb').value.trim()
       };
-      const { error } = await supabase.from('site_settings').update(data).eq('id',1);
+      const { error } = await sb.from('site_settings').update(data).eq('id',1);
       alert(error ? 'No se pudo guardar: '+error.message : 'Datos guardados.');
       await loadAll(); render();
     });
