@@ -54,13 +54,16 @@
   .hero-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
   .hero-eyebrow::before{content:"";width:22px;height:1px;background:var(--cyan);}
   .hero h1{font-family:var(--font-display);font-weight:800;font-size:52px;line-height:1.06;margin:0 0 18px;letter-spacing:-1px;max-width:680px;}
+  .category-hero{padding:34px 0;}
+  .category-hero h1{font-size:28px;margin:0;}
   .hero p.sub{font-family:var(--font-body);font-size:18.5px;line-height:1.55;color:#D3D9EC;margin:0 0 34px;max-width:540px;}
   .hero-cta{display:inline-flex;align-items:center;gap:10px;background:var(--cyan);color:var(--navy);font-family:var(--font-display);font-weight:700;font-size:16px;padding:17px 30px;border-radius:10px;text-decoration:none;box-shadow:0 8px 24px rgba(14,165,183,0.35);transition:transform 0.18s ease, box-shadow 0.18s ease;border:none;cursor:pointer;}
   .hero-cta:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(14,165,183,0.45);}
   .hero-btn-row{display:flex;flex-wrap:wrap;gap:14px;}
- .hero-cta-outline{background:rgba(14,165,183,0.22);color:#fff;border:1.5px solid rgba(14,165,183,0.55);box-shadow:none;font-size:15px;padding:16px 28px;backdrop-filter:blur(4px);width:100%;max-width:480px;box-sizing:border-box;justify-content:center;}
-.hero-cta-outline:hover{background:rgba(14,165,183,0.32);border-color:rgba(14,165,183,0.8);box-shadow:none;}
-.commercial-chip{display:flex;align-items:center;gap:12px;background:rgba(14,165,183,0.14);border:1px solid rgba(14,165,183,0.4);backdrop-filter:blur(6px);padding:15px 22px;border-radius:12px;font-family:var(--font-display);font-weight:700;font-size:17px;line-height:1.35;color:#fff;margin-top:24px;width:100%;max-width:480px;box-sizing:border-box;}
+  .hero-cta-outline{background:rgba(14,165,183,0.22);color:#fff;border:1.5px solid rgba(14,165,183,0.55);box-shadow:none;font-size:15px;padding:16px 28px;backdrop-filter:blur(4px);width:100%;max-width:480px;box-sizing:border-box;justify-content:center;}
+  .hero-cta-outline:hover{background:rgba(14,165,183,0.32);border-color:rgba(14,165,183,0.8);box-shadow:none;}
+  .commercial-chip{display:flex;align-items:center;gap:12px;background:rgba(14,165,183,0.14);border:1px solid rgba(14,165,183,0.4);backdrop-filter:blur(6px);padding:15px 22px;border-radius:12px;font-family:var(--font-display);font-weight:700;font-size:17px;line-height:1.35;color:#fff;margin-top:24px;width:100%;max-width:480px;box-sizing:border-box;}
+  .commercial-chip .spark{color:var(--cyan);font-size:20px;flex-shrink:0;}
 
   /* ===== BENEFITS ===== */
   .benefits-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
@@ -108,7 +111,7 @@
 
   /* ===== VEHICLE GRID ===== */
   .backlink{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);text-decoration:none;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin-bottom:22px;text-transform:uppercase;letter-spacing:0.5px;box-shadow:var(--shadow);transition:transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, border-color 0.2s ease;}
-.backlink:hover{color:var(--navy);transform:translateY(-2px) scale(1.03);box-shadow:0 16px 38px rgba(14,165,183,0.30), 0 2px 8px rgba(14,165,183,0.14);border-color:var(--cyan);}
+  .backlink:hover{color:var(--navy);transform:translateY(-2px) scale(1.03);box-shadow:0 16px 38px rgba(14,165,183,0.30), 0 2px 8px rgba(14,165,183,0.14);border-color:var(--cyan);}
 
   .veh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px;}
   .veh-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;box-shadow:var(--shadow);}
@@ -181,7 +184,7 @@
   .social-row{display:flex;gap:10px;margin-top:14px;}
   .social-row a{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);padding:7px 13px;border-radius:999px;text-decoration:none;color:#fff;}
 
- footer{padding:22px 0;text-align:center;font-family:var(--font-mono);font-size:11px;color:#9AA1AF;line-height:1.8;}
+  footer{padding:22px 0;text-align:center;font-family:var(--font-mono);font-size:11px;color:#9AA1AF;line-height:1.8;}
   .admin-link{background:none;border:none;color:#B7BEC9;cursor:pointer;font-family:var(--font-mono);font-size:11px;text-decoration:underline;}
 
   /* ===== ADMIN ===== */
@@ -252,6 +255,59 @@
     .spec-item:nth-child(2n){border-right:1px solid var(--line);}
   }
   @media(max-width:520px){
-    .benefits-grid{grid-template-columns:1fr;}
     .cat-grid{grid-template-columns:1fr 1fr;}
+  }
+
+  /* ===== MOBILE REFINEMENT (320–600px) — visual/spacing only ===== */
+  @media(max-width:600px){
+    html{overflow-x:hidden;}
+    body{overflow-x:hidden;}
+    .wrap{padding:0 16px;}
+
+    /* respect device notch / status bar */
+    .topbar{padding-top:calc(14px + env(safe-area-inset-top));}
+
+    /* section rhythm: less dead air between blocks */
+    .section{padding:32px 0;}
+
+    /* brand cards: tighter, still feel like big buttons */
+    .cat-grid{gap:12px;}
+    .cat-card{padding:16px 10px 14px;border-radius:14px;}
+    .cat-media{height:44px;margin-bottom:10px;}
+    .cat-mark{font-size:14.5px;}
+    .cat-card.trailer .cat-mark{font-size:12.5px;}
+    .cat-count{font-size:9.5px;}
+
+    /* benefit cards: compact, still 2 columns (set above), less padding */
+    .benefits-grid{gap:10px;}
+    .benefit-card{padding:14px 12px;}
+    .benefit-icon{width:32px;height:32px;margin-bottom:9px;}
+    .benefit-title{font-size:13px;}
+    .benefit-text{font-size:11.5px;}
+
+    /* about: institutional, not a wall of text */
+    .about-section{padding:30px 0;}
+    .about-inner p{font-size:13.5px;line-height:1.6;}
+    .about-inner h2{font-size:19px;margin-bottom:9px;}
+
+    /* contact: clearer hierarchy, easy-to-tap WhatsApp button */
+    .contact-section{padding:34px 0;}
+    .contact-grid{gap:22px;}
+    .contact-section h2{font-size:19px;}
+    .wa-btn{width:100%;justify-content:center;padding:14px 20px;}
+
+    /* category (brand) header: a bit shorter so vehicles come sooner */
+    .category-hero{padding:22px 0;}
+    .category-hero h1{font-size:22px;}
+    .backlink{margin-bottom:16px;}
+
+    /* vehicle cards: independent components with consistent side margins */
+    .veh-grid{gap:16px;}
+    .veh-body{padding:14px 15px 16px;}
+    .veh-modelo{font-size:17px;}
+    .badge{font-size:10.5px;padding:6px 11px 6px 9px;}
+
+    /* floating WhatsApp: stay clear of footer/content, respect home indicator */
+    .wa-float{width:50px;height:50px;bottom:calc(16px + env(safe-area-inset-bottom));right:16px;}
+    footer{padding-bottom:90px;}
   }
