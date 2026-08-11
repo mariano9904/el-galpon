@@ -45,7 +45,6 @@ function waLink(v){
   const txt = v ? `Hola, quería consultar por el precio y la financiación del ${v.marca} ${v.modelo} modelo ${v.anio||'s/d'}.` : 'Hola! Quería consultar por los camiones publicados.';
   return `https://wa.me/${num}?text=${encodeURIComponent(txt)}`;
 }
-}
 function waFinanceLink(v){
   if(!settings.whatsapp) return null;
   const num = settings.whatsapp.replace(/[^0-9]/g,'');
