@@ -42,8 +42,9 @@ function specItem(icon, lbl, val, always){
 function waLink(v){
   if(!settings.whatsapp) return null;
   const num = settings.whatsapp.replace(/[^0-9]/g,'');
-  const txt = v ? `Hola! Te consulto por el ${v.marca} ${v.modelo} (${v.anio||'s/d'}) que vi en el catálogo.` : 'Hola! Quería consultar por los camiones publicados.';
+  const txt = v ? `Hola, quería consultar por el precio y la financiación del ${v.marca} ${v.modelo} modelo ${v.anio||'s/d'}.` : 'Hola! Quería consultar por los camiones publicados.';
   return `https://wa.me/${num}?text=${encodeURIComponent(txt)}`;
+}
 }
 function waFinanceLink(v){
   if(!settings.whatsapp) return null;
