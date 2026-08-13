@@ -261,4 +261,67 @@ function updateGallery(newIndex, dir){
   document.querySelectorAll('.thumb').forEach((t,i)=>t.classList.toggle('active', i===newIndex));
 }
 
+function openLightbox(idx){
+  const v = vehicles.find(t=>t.id===state.vehicleId);
+  if(!v || !v.fotos || !v.fotos.length) return;
+  state.galleryIndex = idx;
+  renderLightbox();
+}
+function closeLightbox(){
+  const el = document.getElementById('lightboxOverlay');
+  if(el) el.remove();
+  document.body.style.overflow = '';
+  document.removeEventListener('keydown', lightboxKeyHandler);
+}
+function lightboxKeyHandler(e){
+  if(e.key==='Escape') closeLightbox();
+  if(e.key==='ArrowRight') shiftLightbox(1);
+  if(e.key==='ArrowLeft') shiftLightbox(-1);
+}
+function shiftLightbox(dir){
+  const v = vehicles.find(t=>t.id===state.vehicleId);
+  if(!v || !v.fotos || v.fotos.length<2) return;
+  const n = v.fotos.length;
+  state.galleryIndex = ((state.galleryIndex+dir)%n+n)%n;
+  const img = document.getElementById('lightboxImg');
+  const counter = document.getElementById('lightboxCounter');
+  if(img) img.src = v.fotos[state.galleryIndex];
+  if(counter) counter.textContent = `${state.galleryIndex+1} / ${v.fotos.length}`;
+  const main = document.querySelector('.gallery-bg-main');
+  const blur = document.querySelector('.gallery-bg-blur');
+  if(main) main.style.backgroundImage = `url('${v.fotos[state.galleryIndex]}')`;
+  if(blur) blur.style.backgroundImage = `url('${v.fotos[state.galleryIndex]}')`;
+  document.querySelectorAll('.thumb').forEach((t,i)=>t.classList.toggle('active', i===state.galleryIndex));
+}
+function renderLightbox(){
+  const v = vehicles.find(t=>t.id===state.vehicleId);
+  if(!v || !v.fotos || !v.fotos.length) return;
+  const existing = document.getElementById('lightboxOverlay');
+  if(existing) existing.remove();
+  const wrap = document.createElement('div');
+  wrap.id = 'lightboxOverlay';
+  wrap.className = 'lightbox';
+  wrap.innerHTML = `
+    <button class="lightbox-close" id="lightboxCloseBtn" aria-label="Cerrar">✕</button>
+    ${v.fotos.length>1?`<button class="lightbox-nav prev" id="lightboxPrev">‹</button><button class="lightbox-nav next" id="lightboxNext">›</button>`:''}
+    <img class="lightbox-img" id="lightboxImg" src="${v.fotos[state.galleryIndex]}" alt="${esc(v.marca)} ${esc(v.modelo)}">
+    ${v.fotos.length>1?`<div class="lightbox-counter" id="lightboxCounter">${state.galleryIndex+1} / ${v.fotos.length}</div>`:''}
+  `;
+  document.body.appendChild(wrap);
+  document.body.style.overflow = 'hidden';
+  wrap.addEventListener('click', (e)=>{ if(e.target===wrap) closeLightbox(); });
+  document.getElementById('lightboxCloseBtn').addEventListener('click', closeLightbox);
+  const p = document.getElementById('lightboxPrev'); if(p) p.addEventListener('click', ()=>shiftLightbox(-1));
+  const n = document.getElementById('lightboxNext'); if(n) n.addEventListener('click', ()=>shiftLightbox(1));
+  document.addEventListener('keydown', lightboxKeyHandler);
+  let startX = null;
+  wrap.addEventListener('touchstart', e=>{ startX = e.touches[0].clientX; }, {passive:true});
+  wrap.addEventListener('touchend', e=>{
+    if(startX===null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if(Math.abs(dx) > 40) shiftLightbox(dx < 0 ? 1 : -1);
+    startX = null;
+  });
+}
+
 loadData();
