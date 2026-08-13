@@ -155,9 +155,9 @@ function renderDetail(){
   const sold = v.estado==='vendido';
   const wa = waLink(v);
   let html = `<button class="backlink" id="backCat">← Volver a ${esc(v.marca)}</button><div class="detail-grid">`;
-  html += `<div><div class="gallery-main ${sold?'sold':''}">
+  html += `<div><div class="gallery-main ${sold?'sold':''}" id="galleryMain">
     <div class="badge ${sold?'vendido':'disponible'}" style="top:14px;left:14px;">${sold?'VENDIDO':'DISPONIBLE'}</div>
-    ${fotos.length?`<div class="photo-bg" id="mainPhoto" style="background-image:url('${esc(fotos[idx])}')"></div>`:`<div class="noimg" style="height:100%;display:flex;align-items:center;justify-content:center;color:#A6ACB8;font-family:var(--font-mono);">Sin fotos cargadas</div>`}
+    ${fotos.length?`<div class="gallery-bg-blur" style="background-image:url('${esc(fotos[idx])}')"></div><div class="gallery-bg-main" style="background-image:url('${esc(fotos[idx])}')"></div>`:`<div class="noimg" style="height:100%;display:flex;align-items:center;justify-content:center;color:#A6ACB8;font-family:var(--font-mono);">Sin fotos cargadas</div>`}
     ${fotos.length>1?`<button class="gallery-nav prev" id="galPrev">‹</button><button class="gallery-nav next" id="galNext">›</button>`:''}
   </div>${fotos.length>1?`<div class="thumbs">${fotos.map((f,i)=>`<div class="thumb ${i===idx?'active':''}" data-i="${i}"><div class="photo-bg" style="background-image:url('${esc(f)}')"></div></div>`).join('')}</div>`:''}</div>`;
   html += `<div class="detail-info fade-in">
@@ -207,14 +207,57 @@ function bind(){
   const prev = document.getElementById('galPrev'); const next = document.getElementById('galNext');
   if(prev) prev.addEventListener('click',()=>shiftGallery(-1));
   if(next) next.addEventListener('click',()=>shiftGallery(1));
-  document.querySelectorAll('.thumb').forEach(el=>el.addEventListener('click',()=>{state.galleryIndex=parseInt(el.dataset.i);render();}));
+  document.querySelectorAll('.thumb').forEach(el=>el.addEventListener('click',()=>{
+    updateGallery(parseInt(el.dataset.i), parseInt(el.dataset.i) > state.galleryIndex ? 1 : -1);
+  }));
+  const gm = document.getElementById('galleryMain');
+  if(gm){
+    gm.setAttribute('tabindex','0');
+    gm.addEventListener('keydown', e=>{
+      if(e.key==='ArrowRight') shiftGallery(1);
+      if(e.key==='ArrowLeft') shiftGallery(-1);
+    });
+    let touchStartX = null;
+    gm.addEventListener('touchstart', e=>{ touchStartX = e.touches[0].clientX; }, {passive:true});
+    gm.addEventListener('touchend', e=>{
+      if(touchStartX===null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if(Math.abs(dx) > 40) shiftGallery(dx < 0 ? 1 : -1);
+      touchStartX = null;
+    });
+  }
 }
 function shiftGallery(dir){
   const v = vehicles.find(t=>t.id===state.vehicleId);
+  if(!v || !v.fotos || v.fotos.length<2) return;
+  const n = v.fotos.length;
+  const newIndex = ((state.galleryIndex+dir)%n+n)%n;
+  updateGallery(newIndex, dir);
+}
+function updateGallery(newIndex, dir){
+  const v = vehicles.find(t=>t.id===state.vehicleId);
   if(!v || !v.fotos) return;
   const n = v.fotos.length;
-  state.galleryIndex = ((state.galleryIndex+dir)%n+n)%n;
-  render();
+  newIndex = ((newIndex%n)+n)%n;
+  if(newIndex === state.galleryIndex) return;
+  state.galleryIndex = newIndex;
+  const main = document.querySelector('.gallery-bg-main');
+  const blur = document.querySelector('.gallery-bg-blur');
+  if(!main || !blur){ render(); return; }
+  const url = v.fotos[newIndex];
+  const offset = dir > 0 ? 28 : -28;
+  main.style.transition = 'none';
+  main.style.opacity = '0';
+  main.style.transform = `translateX(${offset}px) scale(1.02)`;
+  void main.offsetWidth;
+  requestAnimationFrame(()=>{
+    main.style.backgroundImage = `url('${url}')`;
+    blur.style.backgroundImage = `url('${url}')`;
+    main.style.transition = 'opacity 0.32s ease, transform 0.32s cubic-bezier(.2,.7,.3,1)';
+    main.style.opacity = '1';
+    main.style.transform = 'translateX(0) scale(1)';
+  });
+  document.querySelectorAll('.thumb').forEach((t,i)=>t.classList.toggle('active', i===newIndex));
 }
 
 loadData();
