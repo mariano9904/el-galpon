@@ -225,6 +225,7 @@ function bind(){
       if(Math.abs(dx) > 40) shiftGallery(dx < 0 ? 1 : -1);
       touchStartX = null;
     });
+    gm.addEventListener('click', ()=>openLightbox(state.galleryIndex));
   }
 }
 function shiftGallery(dir){
