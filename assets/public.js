@@ -97,7 +97,7 @@ function renderBenefits(){
     ['<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M3 16V8a1 1 0 0 1 1-1h9v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.8" stroke="currentColor" stroke-width="1.7"/><circle cx="17.5" cy="17.5" r="1.8" stroke="currentColor" stroke-width="1.7"/></svg>','Listos para trabajar','Unidades revisadas y listas para salir a ruta.'],
     ['<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.4-9.5-8.8C.7 8.6 2.4 5 6 5c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.6 0 5.3 3.6 3.5 7.2C19 16.6 12 21 12 21Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>','Atención personalizada','Te acompañamos en cada paso de la operación.']
   ];
-  return `<div class="wrap section" style="padding-top:36px;padding-bottom:0;"><div class="benefits-grid fade-in">
+ return `<div class="wrap section benefits-wrap"><div class="benefits-grid fade-in">
     ${items.map(([i,t,d])=>`<div class="benefit-card"><div class="benefit-icon">${i}</div><div class="benefit-title">${t}</div><div class="benefit-text">${d}</div></div>`).join('')}
   </div></div>`;
 }
