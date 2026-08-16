@@ -31,10 +31,9 @@
 
   /* ===== TOP INFO BAR ===== */
 .topinfo{background:#0B1528;color:#9AA6C4;padding:7px 0;overflow:hidden;}
-  .topinfo-track{display:flex;gap:28px;justify-content:center;font-family:var(--font-mono);font-size:11px;letter-spacing:0.3px;}
+  @keyframes topinfoScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .topinfo-track{display:flex;gap:28px;justify-content:flex-start;width:max-content;font-family:var(--font-mono);font-size:11px;letter-spacing:0.3px;animation:topinfoScroll 26s linear infinite;}
   .topinfo-track span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;}
-  .topinfo-track span:nth-child(n+4){display:none;}
-
   /* ===== TOP BAR ===== */
   .topbar{background:var(--navy);color:#fff;padding:14px 0;}
   .topbar .wrap{display:flex;align-items:center;justify-content:space-between;}
@@ -287,11 +286,7 @@
     /* respect device notch / status bar */
     .topbar{padding-top:calc(14px + env(safe-area-inset-top));}
 
-    /* top info bar: gentle continuous scroll instead of hidden swipe */
-    @keyframes topinfoScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-    .topinfo-track{justify-content:flex-start;width:max-content;animation:topinfoScroll 22s linear infinite;}
-    .topinfo-track span:nth-child(n+4){display:inline-flex;}
-
+   
     /* section rhythm: less dead air between blocks */
     .section{padding:32px 0;}
 
