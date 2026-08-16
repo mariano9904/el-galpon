@@ -60,7 +60,7 @@ function render(){
 }
 
 function renderTopInfo(){
-  return `<div class="topinfo"><div class="wrap"><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span></div></div>`;
+ return `<div class="topinfo"><div class="topinfo-track"><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span></div></div>`;
 }
 function renderTopbar(){
   return `<div class="topbar"><div class="wrap">
