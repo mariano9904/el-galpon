@@ -269,7 +269,7 @@
     .hero h1{font-size:32px;}
     .hero p.sub{font-size:15px;}
     .hero{padding:56px 0 48px;}
-   .topinfo-track{gap:16px;}
+    .topinfo-track{gap:16px;animation-duration:20s;}
     .spec-grid{grid-template-columns:1fr;}
     .spec-item:nth-child(2n){border-right:1px solid var(--line);}
   }
