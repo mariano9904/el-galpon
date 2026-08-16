@@ -281,7 +281,7 @@
   @media(max-width:600px){
     html{overflow-x:hidden;}
     body{overflow-x:hidden;}
-    .wrap{padding:0 16px;}
+  .wrap{padding:0 20px;}
 
     /* respect device notch / status bar */
     .topbar{padding-top:calc(14px + env(safe-area-inset-top));}
