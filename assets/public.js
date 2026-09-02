@@ -17,7 +17,7 @@ const SPEC_ICONS = {
 let vehicles = [];
 let brands = [];
 let settings = {};
-let state = { view:'home', category:null, vehicleId:null, galleryIndex:0 };
+let state = { view:'home', category:null, vehicleId:null, galleryIndex:0, searchQuery:'', filterPrice:'', filterYear:'' };
 
 async function loadData(){
   const [{data: v}, {data: b}, {data: s}] = await Promise.all([
@@ -35,6 +35,24 @@ function esc(str){ const d=document.createElement('div'); d.textContent = str==n
 function fmtMoney(n){ if(n===''||n==null) return 'Consultar precio'; return 'USD ' + Number(n).toLocaleString('es-AR'); }
 function fmtKm(n){ if(n===''||n==null) return '—'; return Number(n).toLocaleString('es-AR') + ' km'; }
 function catCount(name){ return vehicles.filter(v=>v.marca===name).length; }
+function matchesFilters(v){
+  if(state.searchQuery){
+    const q = state.searchQuery.toLowerCase();
+    const hay = `${v.marca} ${v.modelo} ${v.anio}`.toLowerCase();
+    if(!hay.includes(q)) return false;
+  }
+  if(state.filterPrice){
+    const [min,max] = state.filterPrice.split('-').map(Number);
+    const p = Number(v.precio);
+    if(!v.precio || isNaN(p) || p<min || p>max) return false;
+  }
+  if(state.filterYear){
+    const [min,max] = state.filterYear.split('-').map(Number);
+    const y = Number(v.anio);
+    if(!v.anio || isNaN(y) || y<min || y>max) return false;
+  }
+  return true;
+}
 function specItem(icon, lbl, val, always){
   if(!always && !val) return '';
   return `<div class="spec-item"><span>${SPEC_ICONS[icon]}</span><div class="txt"><div class="lbl">${esc(lbl)}</div><div class="val">${esc(val)||'—'}</div></div></div>`;
@@ -51,7 +69,7 @@ function waFinanceLink(v){
   const txt = `Hola, vi publicado el ${v.marca} ${v.modelo} en ${BRAND_NAME} y quisiera recibir información sobre las opciones de financiación.`;
   return `https://wa.me/${num}?text=${encodeURIComponent(txt)}`;
 }
-function go(view, extra){ state = {...state, view, ...extra}; window.scrollTo({top:0,behavior:'instant'}); render(); }
+function go(view, extra){ state = {...state, view, searchQuery:'', filterPrice:'', filterYear:'', ...extra}; window.scrollTo({top:0,behavior:'instant'}); render(); }
 
 function render(){
   const app = document.getElementById('app');
@@ -60,7 +78,7 @@ function render(){
 }
 
 function renderTopInfo(){
- return `<div class="topinfo"><div class="topinfo-track"><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span></div></div>`;
+  return `<div class="topinfo"><div class="topinfo-track"><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span></div></div>`;
 }
 function renderTopbar(){
   return `<div class="topbar"><div class="wrap">
@@ -78,7 +96,11 @@ function renderFloatingWA(){
 function renderBody(){
   if(state.view==='category') return renderCategoryHero() + `<div class="wrap section">${renderCategoryList()}</div>`;
   if(state.view==='detail') return `<div class="wrap section">${renderDetail()}</div>`;
-  return renderHero() + `<div class="wrap section" id="catalogo">${renderCategoryGrid()}</div>` + renderBenefits() + renderAbout();
+  const hasFilters = !!(state.searchQuery || state.filterPrice || state.filterYear);
+  if(hasFilters){
+    return renderHero() + `<div class="wrap section" id="catalogo">${renderSearchBar()}${renderSearchResults()}</div>`;
+  }
+  return renderHero() + `<div class="wrap section" id="catalogo">${renderSearchBar()}${renderCategoryGrid()}</div>` + renderBenefits() + renderAbout();
 }
 function renderHero(){
   const bg = settings.hero_image_url ? `style="background-image:linear-gradient(180deg,rgba(10,17,35,0.2),rgba(10,17,35,0.5)),url('${esc(settings.hero_image_url)}')"` : '';
@@ -90,6 +112,47 @@ function renderHero(){
     <div><div class="commercial-chip"><span class="spark">★</span> ${esc(settings.frase_comercial||'')}</div></div>
   </div></div>`;
 }
+function renderSearchBar(){
+  const hasFilters = state.searchQuery || state.filterPrice || state.filterYear;
+  return `<div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Buscar por marca, modelo o año..." value="${esc(state.searchQuery||'')}">
+    <select id="filterPrice">
+      <option value="">Precio: cualquiera</option>
+      <option value="0-50000" ${state.filterPrice==='0-50000'?'selected':''}>Hasta USD 50.000</option>
+      <option value="50000-100000" ${state.filterPrice==='50000-100000'?'selected':''}>USD 50.000 - 100.000</option>
+      <option value="100000-999999999" ${state.filterPrice==='100000-999999999'?'selected':''}>Más de USD 100.000</option>
+    </select>
+    <select id="filterYear">
+      <option value="">Año: cualquiera</option>
+      <option value="2020-2099" ${state.filterYear==='2020-2099'?'selected':''}>2020 en adelante</option>
+      <option value="2015-2019" ${state.filterYear==='2015-2019'?'selected':''}>2015 - 2019</option>
+      <option value="0-2014" ${state.filterYear==='0-2014'?'selected':''}>Antes de 2015</option>
+    </select>
+    ${hasFilters?`<button class="btn btn-sm" id="clearFilters">Limpiar</button>`:''}
+  </div>`;
+}
+function renderVehCard(v){
+  const sold = v.estado==='vendido';
+  const cover = v.fotos && v.fotos[0];
+  return `<div class="veh-card" data-id="${v.id}">
+    <div class="veh-photo ${sold?'sold':''}">
+      ${cover?`<div class="photo-bg" style="background-image:url('${esc(cover)}')"></div>`:`<div class="noimg">Sin foto</div>`}
+      <div class="badge ${sold?'vendido':'disponible'}">${sold?'VENDIDO':'DISPONIBLE'}</div>
+    </div>
+    <div class="veh-body">
+      <div class="veh-marca">${esc(v.marca)}</div>
+      <div class="veh-modelo">${esc(v.modelo)}</div>
+      <div class="veh-specs"><span>${esc(v.anio)||'—'}</span><span>${fmtKm(v.km)}</span>${v.configuracion?`<span>${esc(v.configuracion)}</span>`:''}</div>
+      <div class="veh-price">${fmtMoney(v.precio)}</div>
+      <div class="veh-finance">✔ Financiación disponible<br>✔ Recibimos usados en parte de pago</div>
+    </div>
+  </div>`;
+}
+function renderSearchResults(){
+  const list = vehicles.filter(matchesFilters);
+  if(list.length===0) return `<div class="empty"><h2>No encontramos camiones con esos filtros</h2></div>`;
+  return `<div class="section-title">Resultados (${list.length})</div><div class="veh-grid">${list.map(renderVehCard).join('')}</div>`;
+}
 function renderBenefits(){
   const items = [
     ['<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M2 10h20" stroke="currentColor" stroke-width="1.7"/></svg>','Financiación propia','Facilitamos la compra con financiación directa.'],
@@ -97,7 +160,7 @@ function renderBenefits(){
     ['<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M3 16V8a1 1 0 0 1 1-1h9v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.8" stroke="currentColor" stroke-width="1.7"/><circle cx="17.5" cy="17.5" r="1.8" stroke="currentColor" stroke-width="1.7"/></svg>','Listos para trabajar','Unidades revisadas y listas para salir a ruta.'],
     ['<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.4-9.5-8.8C.7 8.6 2.4 5 6 5c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.6 0 5.3 3.6 3.5 7.2C19 16.6 12 21 12 21Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>','Atención personalizada','Te acompañamos en cada paso de la operación.']
   ];
- return `<div class="wrap section benefits-wrap"><div class="benefits-grid fade-in">
+  return `<div class="wrap section benefits-wrap"><div class="benefits-grid fade-in">
     ${items.map(([i,t,d])=>`<div class="benefit-card"><div class="benefit-icon">${i}</div><div class="benefit-title">${t}</div><div class="benefit-text">${d}</div></div>`).join('')}
   </div></div>`;
 }
@@ -123,28 +186,15 @@ function renderCategoryHero(){
   return `<div class="hero category-hero"><div class="wrap"><h1>${esc(state.category)}</h1></div></div>`;
 }
 function renderCategoryList(){
-  const list = vehicles.filter(v=>v.marca===state.category);
+  const list = vehicles.filter(v=>v.marca===state.category).filter(matchesFilters);
   let html = `<button class="backlink" id="backHome">← Volver</button>`;
-  if(list.length===0){ html += `<div class="empty"><h2>Todavía no hay unidades cargadas en esta categoría</h2></div>`; return html; }
-  html += `<div class="veh-grid">`;
-  list.forEach(v=>{
-    const sold = v.estado==='vendido';
-    const cover = v.fotos && v.fotos[0];
-    html += `<div class="veh-card" data-id="${v.id}">
-      <div class="veh-photo ${sold?'sold':''}">
-        ${cover?`<div class="photo-bg" style="background-image:url('${esc(cover)}')"></div>`:`<div class="noimg">Sin foto</div>`}
-        <div class="badge ${sold?'vendido':'disponible'}">${sold?'VENDIDO':'DISPONIBLE'}</div>
-      </div>
-      <div class="veh-body">
-        <div class="veh-marca">${esc(v.marca)}</div>
-        <div class="veh-modelo">${esc(v.modelo)}</div>
-        <div class="veh-specs"><span>${esc(v.anio)||'—'}</span><span>${fmtKm(v.km)}</span>${v.configuracion?`<span>${esc(v.configuracion)}</span>`:''}</div>
-        <div class="veh-price">${fmtMoney(v.precio)}</div>
-        <div class="veh-finance">✔ Financiación disponible<br>✔ Recibimos usados en parte de pago</div>
-      </div>
-    </div>`;
-  });
-  html += `</div>`;
+  html += renderSearchBar();
+  if(list.length===0){
+    const msg = (state.searchQuery||state.filterPrice||state.filterYear) ? 'No encontramos camiones con esos filtros' : 'Todavía no hay unidades cargadas en esta categoría';
+    html += `<div class="empty"><h2>${msg}</h2></div>`;
+    return html;
+  }
+  html += `<div class="veh-grid">${list.map(renderVehCard).join('')}</div>`;
   return html;
 }
 function renderDetail(){
@@ -227,6 +277,21 @@ function bind(){
     });
     gm.addEventListener('click', ()=>openLightbox(state.galleryIndex));
   }
+  const searchInput = document.getElementById('searchInput');
+  if(searchInput){
+    searchInput.addEventListener('input', (e)=>{
+      state.searchQuery = e.target.value;
+      render();
+      const inp = document.getElementById('searchInput');
+      if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+    });
+  }
+  const filterPriceEl = document.getElementById('filterPrice');
+  if(filterPriceEl) filterPriceEl.addEventListener('change', e=>{ state.filterPrice = e.target.value; render(); });
+  const filterYearEl = document.getElementById('filterYear');
+  if(filterYearEl) filterYearEl.addEventListener('change', e=>{ state.filterYear = e.target.value; render(); });
+  const clearBtn = document.getElementById('clearFilters');
+  if(clearBtn) clearBtn.addEventListener('click', ()=>{ state.searchQuery=''; state.filterPrice=''; state.filterYear=''; render(); });
 }
 function shiftGallery(dir){
   const v = vehicles.find(t=>t.id===state.vehicleId);
