@@ -40,6 +40,8 @@
   .topbar .wrap{display:flex;align-items:center;justify-content:space-between;}
   .brand{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:0.1px;display:flex;align-items:center;gap:9px;}
   .brand .logo-mark{flex-shrink:0;display:block;}
+  .brand{cursor:pointer;transition:opacity 0.15s ease;}
+  .brand:hover{opacity:0.85;}
   .topbar-right{display:flex;align-items:center;gap:16px;}
   .topbar-cats{display:flex;align-items:center;gap:14px;font-family:var(--font-display);font-weight:600;font-size:14.5px;letter-spacing:0.2px;color:#E4E8F2;}
   .topbar-cats span{white-space:nowrap;}
@@ -304,7 +306,7 @@
 
     /* search bar: stack cleanly */
     .search-bar{gap:8px;margin-bottom:20px;}
-    .search-bar input[type="text"]{min-width:100%;}
+   .search-input-wrap{min-width:100%;}
     .search-bar select{flex:1;}
 
     /* brand cards: tighter, still feel like big buttons */
