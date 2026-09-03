@@ -250,6 +250,11 @@ function renderFooter(){
   return `<footer>${BRAND_NAME} · Catálogo de vehículos usados<br>© ${year} ${BRAND_NAME}. Todos los derechos reservados.</footer>`;
 }
 function bind(){
+   const logoHome = document.getElementById('logoHome');
+  if(logoHome){
+    logoHome.addEventListener('click', ()=>go('home'));
+    logoHome.addEventListener('keydown', e=>{ if(e.key==='Enter') go('home'); });
+  }
   document.querySelectorAll('.cat-card').forEach(el=>{
     el.addEventListener('click', ()=>go('category',{category:el.dataset.cat}));
     el.addEventListener('keydown', e=>{ if(e.key==='Enter') go('category',{category:el.dataset.cat}); });
