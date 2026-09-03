@@ -114,8 +114,11 @@ function renderHero(){
 }
 function renderSearchBar(){
   const hasFilters = state.searchQuery || state.filterPrice || state.filterYear;
-  return `<div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Buscar por marca, modelo o año..." value="${esc(state.searchQuery||'')}">
+   return `<div class="search-bar">
+    <div class="search-input-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="text" id="searchInput" placeholder="Buscar por marca, modelo o año..." value="${esc(state.searchQuery||'')}">
+    </div>
     <select id="filterPrice">
       <option value="">Precio: cualquiera</option>
       <option value="0-50000" ${state.filterPrice==='0-50000'?'selected':''}>Hasta USD 50.000</option>
