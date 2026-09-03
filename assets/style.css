@@ -30,10 +30,11 @@
   a{color:inherit;}
 
   /* ===== TOP INFO BAR ===== */
-.topinfo{background:#0B1528;color:#9AA6C4;padding:7px 0;overflow:hidden;}
+  .topinfo{background:#0B1528;color:#9AA6C4;padding:7px 0;overflow:hidden;}
   @keyframes topinfoScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   .topinfo-track{display:flex;gap:28px;justify-content:flex-start;width:max-content;font-family:var(--font-mono);font-size:11px;letter-spacing:0.3px;animation:topinfoScroll 26s linear infinite;}
   .topinfo-track span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;}
+
   /* ===== TOP BAR ===== */
   .topbar{background:var(--navy);color:#fff;padding:14px 0;}
   .topbar .wrap{display:flex;align-items:center;justify-content:space-between;}
@@ -65,7 +66,15 @@
   .commercial-chip{display:flex;align-items:center;gap:12px;background:rgba(14,165,183,0.14);border:1px solid rgba(14,165,183,0.4);backdrop-filter:blur(6px);padding:15px 22px;border-radius:12px;font-family:var(--font-display);font-weight:700;font-size:17px;line-height:1.35;color:#fff;margin-top:24px;width:100%;max-width:480px;box-sizing:border-box;}
   .commercial-chip .spark{color:var(--cyan);font-size:20px;flex-shrink:0;}
 
-   /* ===== BENEFITS ===== */
+  /* ===== SEARCH / FILTERS ===== */
+  .search-bar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 28px;}
+  .search-bar input[type="text"]{flex:1;min-width:220px;padding:12px 16px;border:1px solid var(--line);border-radius:10px;font-family:var(--font-body);font-size:14px;background:var(--surface);color:var(--ink);}
+  .search-bar input[type="text"]:focus{outline:2px solid var(--cyan);border-color:var(--cyan);}
+  .search-bar select{padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-family:var(--font-mono);font-size:12.5px;background:var(--surface);color:var(--ink);cursor:pointer;}
+  .search-bar select:focus{outline:2px solid var(--cyan);}
+  .search-bar #clearFilters{white-space:nowrap;}
+
+  /* ===== BENEFITS ===== */
   .benefits-wrap{padding-top:36px;padding-bottom:0;}
   .benefits-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:stretch;}
   .benefit-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 18px;box-shadow:var(--shadow);transition:transform 0.2s ease, box-shadow 0.2s ease;height:100%;box-sizing:border-box;}
@@ -281,14 +290,18 @@
   @media(max-width:600px){
     html{overflow-x:hidden;}
     body{overflow-x:hidden;}
-  .wrap{padding:0 20px;}
+    .wrap{padding:0 20px;}
 
     /* respect device notch / status bar */
     .topbar{padding-top:calc(14px + env(safe-area-inset-top));}
 
-   
     /* section rhythm: less dead air between blocks */
     .section{padding:32px 0;}
+
+    /* search bar: stack cleanly */
+    .search-bar{gap:8px;margin-bottom:20px;}
+    .search-bar input[type="text"]{min-width:100%;}
+    .search-bar select{flex:1;}
 
     /* brand cards: tighter, still feel like big buttons */
     .cat-grid{gap:12px;}
@@ -298,8 +311,7 @@
     .cat-card.trailer .cat-mark{font-size:12.5px;}
     .cat-count{font-size:9.5px;}
 
-   
-   /* benefit cards: compact, still 2 columns (set above), less padding */
+    /* benefit cards: compact, still 2 columns (set above), less padding */
     .benefits-wrap{padding-bottom:20px;}
     .benefits-grid{gap:10px;}
     .benefit-card{padding:14px 12px;}
