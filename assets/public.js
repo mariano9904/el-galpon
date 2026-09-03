@@ -82,7 +82,7 @@ function renderTopInfo(){
 }
 function renderTopbar(){
   return `<div class="topbar"><div class="wrap">
-    <div class="brand">${LOGO} ${BRAND_NAME}</div>
+    <div class="brand" id="logoHome" role="button" tabindex="0">${LOGO} ${BRAND_NAME}</div>
     <div class="topbar-right">
       <div class="topbar-cats"><span>Camiones</span><span>Semi-Tanques</span><span>Acoplados-Cerealeros</span><span>Semi-Baranda</span></div>
       ${settings.telefono?`<span class="topbar-phone">${esc(settings.telefono)}</span>`:''}
