@@ -18,6 +18,8 @@ let vehicles = [];
 let brands = [];
 let settings = {};
 let state = { view:'home', category:null, vehicleId:null, galleryIndex:0, searchQuery:'', filterPrice:'', filterYear:'' };
+let heroTitleAnimated = false;
+let heroResizeBound = false;
 
 async function loadData(){
   const [{data: v}, {data: b}, {data: s}] = await Promise.all([
