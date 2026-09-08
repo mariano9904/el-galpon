@@ -125,13 +125,19 @@ function renderBody(){
 }
 function renderHero(){
   const bg = settings.hero_image_url ? `style="background-image:linear-gradient(180deg,rgba(10,17,35,0.2),rgba(10,17,35,0.5)),url('${esc(settings.hero_image_url)}')"` : '';
-  return `<div class="hero ${settings.hero_image_url?'has-img':''}" ${bg}><div class="wrap fade-in">
+  const titleText = 'Camiones usados, listos para trabajar';
+  const titleHtml = heroTitleAnimated ? esc(titleText) : staggerHeroTitle(titleText);
+  heroTitleAnimated = true;
+  return `<div class="hero hero-main ${settings.hero_image_url?'has-img':''}" ${bg} id="mainHero"><div class="wrap fade-in">
     <div class="hero-eyebrow">Camiones · Tractores · Semirremolques</div>
-    <h1>Camiones usados, listos para trabajar</h1>
+    <h1>${titleHtml}</h1>
     <p class="sub">Catálogo actualizado de unidades disponibles, con financiación propia. Elegí una marca y encontrá la unidad que necesitás.</p>
     <div class="hero-btn-row">${settings.trailer_pdf_url?`<a href="${settings.trailer_pdf_url}" download class="hero-cta hero-cta-outline">Ver catálogo de acoplados y semis (PDF)</a>`:''}</div>
     <div><div class="commercial-chip"><span class="spark">★</span> ${esc(settings.frase_comercial||'')}</div></div>
   </div></div>`;
+}
+function staggerHeroTitle(text){
+  return text.split(' ').map((w,i)=>`<span class="stagger-word"><span class="stagger-inner" style="animation-delay:${i*55}ms">${esc(w)}</span></span>`).join(' ');
 }
 function renderSearchBar(){
   const hasFilters = state.searchQuery || state.filterPrice || state.filterYear;
