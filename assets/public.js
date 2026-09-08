@@ -72,12 +72,31 @@ function waFinanceLink(v){
   return `https://wa.me/${num}?text=${encodeURIComponent(txt)}`;
 }
 function go(view, extra){ state = {...state, view, searchQuery:'', filterPrice:'', filterYear:'', ...extra}; window.scrollTo({top:0,behavior:'instant'}); render(); }
-
 function render(){
   const app = document.getElementById('app');
   app.innerHTML = renderTopInfo() + renderTopbar() + renderBody() + renderContact() + renderFooter() + renderFloatingWA();
   bind();
+  if(state.view==='home'){ adjustHeroHeight(); bindHeroResize(); }
 }
+function adjustHeroHeight(){
+  const hero = document.getElementById('mainHero');
+  if(!hero) return;
+  const topinfo = document.querySelector('.topinfo');
+  const topbar = document.querySelector('.topbar');
+  const chromeH = (topinfo?topinfo.offsetHeight:0) + (topbar?topbar.offsetHeight:0);
+  const peek = window.innerWidth <= 600 ? 24 : 40;
+  hero.style.minHeight = `calc(100svh - ${chromeH}px - ${peek}px)`;
+}
+function bindHeroResize(){
+  if(heroResizeBound) return;
+  heroResizeBound = true;
+  let t;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(t);
+    t = setTimeout(()=>{ if(state.view==='home') adjustHeroHeight(); }, 150);
+  });
+}
+
 
 function renderTopInfo(){
   return `<div class="topinfo"><div class="topinfo-track"><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span></div></div>`;
