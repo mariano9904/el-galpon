@@ -122,6 +122,13 @@ function renderForm(){
       <option value="disponible" ${v&&v.estado==='disponible'?'selected':''}>Disponible</option>
       <option value="vendido" ${v&&v.estado==='vendido'?'selected':''}>Vendido</option>
     </select></div>
+    <div class="field">
+      <label class="featured-check">
+        <input type="checkbox" id="f-destacado" ${v&&v.destacado?'checked':''}>
+        <span>Producto destacado</span>
+      </label>
+      <div class="hint" style="margin-top:6px;">Si está marcado, puede aparecer en el carrusel de inicio.</div>
+    </div>
     <div class="row2"><div class="field"><label>Motor</label><input type="text" id="f-motor" value="${v?esc(v.motor):''}"></div>
     <div class="field"><label>Caja</label><input type="text" id="f-caja" value="${v?esc(v.caja):''}"></div></div>
     <div class="row3"><div class="field"><label>Configuración</label><input type="text" id="f-config" value="${v?esc(v.configuracion):''}"></div>
@@ -253,6 +260,7 @@ function bind(){
         km: document.getElementById('f-km').value || null,
         precio: document.getElementById('f-precio').value || null,
         estado: document.getElementById('f-estado').value,
+        destacado: document.getElementById('f-destacado').checked,
         motor: document.getElementById('f-motor').value.trim(),
         caja: document.getElementById('f-caja').value.trim(),
         configuracion: document.getElementById('f-config').value.trim(),
