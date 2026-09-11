@@ -733,3 +733,21 @@
   .featured-track{transition:none !important;}
 }
 /* ===== END PR2 FEATURED CAROUSEL ===== */
+
+
+/* ===== ADMIN FEATURED CHECKBOX ===== */
+.featured-check{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.featured-check input{
+  width:18px;
+  height:18px;
+  accent-color:#0EA5B7;
+  cursor:pointer;
+}
+/* ===== END ADMIN FEATURED CHECKBOX ===== */

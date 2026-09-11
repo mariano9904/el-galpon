@@ -155,7 +155,7 @@ function iconSwap(){
 
 function getFeaturedVehicles(){
   return vehicles
-    .filter(v=>Array.isArray(v.fotos) && v.fotos.length && v.fotos[0])
+    .filter(v=>v.destacado===true && Array.isArray(v.fotos) && v.fotos.length && v.fotos[0])
     .slice(0,5);
 }
 
