@@ -519,3 +519,217 @@
   .topinfo-track{animation-play-state:paused;}
 }
 /* ===== END PR1 HERO REFRESH ===== */
+
+/* ===== PR2 FEATURED CAROUSEL ===== */
+.hero-copy{width:auto;}
+
+.hero-layout{
+  display:grid;
+  grid-template-columns:minmax(0,.92fr) minmax(590px,1.08fr);
+  gap:clamp(52px,5vw,84px);
+  align-items:center;
+  width:100%;
+}
+
+.featured-panel{
+  width:100%;
+  min-width:0;
+  padding:18px 18px 15px;
+  border:1px solid rgba(56,181,204,.56);
+  border-radius:18px;
+  background:linear-gradient(145deg,rgba(12,38,61,.82),rgba(7,24,45,.78));
+  backdrop-filter:blur(14px);
+  box-shadow:0 24px 60px rgba(1,10,25,.28);
+}
+
+.featured-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:14px;
+}
+
+.featured-title{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  color:#fff;
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:20px;
+}
+
+.featured-more{
+  border:0;
+  background:transparent;
+  color:#21D6E8;
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+}
+
+.featured-carousel{position:relative;}
+.featured-viewport{overflow:hidden;border-radius:13px;touch-action:pan-y;}
+.featured-track{display:flex;gap:14px;will-change:transform;}
+
+.featured-card{
+  flex:0 0 43.5%;
+  min-width:0;
+  cursor:pointer;
+  outline:none;
+}
+
+.featured-photo{
+  position:relative;
+  width:100%;
+  aspect-ratio:.95;
+  border-radius:12px;
+  overflow:hidden;
+  background-size:cover;
+  background-position:center;
+  background-color:#16304A;
+  border:1px solid rgba(255,255,255,.10);
+}
+
+.featured-card:focus-visible .featured-photo{
+  box-shadow:0 0 0 3px #19C5D6;
+}
+
+.featured-photo-shade{
+  position:absolute;
+  inset:42% 0 0;
+  background:linear-gradient(180deg,transparent,rgba(5,15,29,.86));
+}
+
+.featured-card-copy{
+  position:absolute;
+  z-index:2;
+  left:14px;
+  right:12px;
+  bottom:12px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  color:#fff;
+}
+
+.featured-card-copy strong{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:17px;
+  line-height:1.1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.featured-card-copy span{
+  color:#D1D8E4;
+  font-size:12.5px;
+}
+
+.featured-sold{
+  position:absolute;
+  z-index:3;
+  top:12px;
+  left:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 11px;
+  border-radius:9px;
+  background:rgba(206,50,69,.94);
+  color:#fff;
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:11px;
+}
+
+.featured-sold-check{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  display:inline-grid;
+  place-items:center;
+  background:#FF6B78;
+  font-size:10px;
+}
+
+.featured-arrow{
+  position:absolute;
+  z-index:5;
+  top:50%;
+  transform:translateY(-50%);
+  width:43px;
+  height:43px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(121,205,219,.58);
+  background:rgba(16,43,68,.92);
+  color:#fff;
+  font-size:29px;
+  cursor:pointer;
+}
+
+.featured-prev{left:-20px;}
+.featured-next{right:-20px;}
+
+.featured-dots{
+  display:flex;
+  justify-content:center;
+  gap:9px;
+  margin-top:14px;
+}
+
+.featured-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  padding:0;
+  border:0;
+  background:#4A647E;
+  cursor:pointer;
+}
+
+.featured-dot.active{background:#16C9DD;}
+
+@media(max-width:1180px){
+  .hero-layout{
+    grid-template-columns:minmax(0,.94fr) minmax(520px,1.06fr);
+    gap:36px;
+  }
+
+  .featured-card{flex-basis:45%;}
+}
+
+@media(max-width:980px){
+  .hero-layout{
+    grid-template-columns:1fr;
+    gap:38px;
+  }
+
+  .hero-copy,
+  .featured-panel{
+    max-width:760px;
+  }
+}
+
+@media(max-width:600px){
+  .featured-card{flex-basis:82%;}
+  .featured-panel{padding:16px 14px 14px;}
+  .featured-title{font-size:16px;}
+  .featured-arrow{width:40px;height:40px;}
+  .featured-prev{left:-10px;}
+  .featured-next{right:-10px;}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .featured-track{transition:none !important;}
+}
+/* ===== END PR2 FEATURED CAROUSEL ===== */

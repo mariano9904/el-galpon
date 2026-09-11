@@ -20,6 +20,8 @@ let settings = {};
 let state = { view:'home', category:null, vehicleId:null, galleryIndex:0, searchQuery:'', filterPrice:'', filterYear:'' };
 let heroTitleAnimated = false;
 let heroResizeBound = false;
+let featuredCarouselTimer = null;
+let featuredCarouselIndex = 0;
 
 async function loadData(){
   const [{data: v}, {data: b}, {data: s}] = await Promise.all([
@@ -73,10 +75,11 @@ function waFinanceLink(v){
 }
 function go(view, extra){ state = {...state, view, searchQuery:'', filterPrice:'', filterYear:'', ...extra}; window.scrollTo({top:0,behavior:'instant'}); render(); }
 function render(){
+  if(featuredCarouselTimer){ clearInterval(featuredCarouselTimer); featuredCarouselTimer = null; }
   const app = document.getElementById('app');
   app.innerHTML = renderTopInfo() + renderTopbar() + renderBody() + renderContact() + renderFooter() + renderFloatingWA();
   bind();
-  if(state.view==='home'){ adjustHeroHeight(); bindHeroResize(); }
+  if(state.view==='home'){ adjustHeroHeight(); bindHeroResize(); initFeaturedCarousel(); }
 }
 function adjustHeroHeight(){
   const hero = document.getElementById('mainHero');
@@ -150,44 +153,260 @@ function iconSwap(){
   return `<svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7h-9a4 4 0 0 0-4 4v1M4 17h9a4 4 0 0 0 4-4v-1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="m17 4 3 3-3 3M7 14l-3 3 3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
+function getFeaturedVehicles(){
+  return vehicles
+    .filter(v=>Array.isArray(v.fotos) && v.fotos.length && v.fotos[0])
+    .slice(0,5);
+}
+
+function featuredTruckIcon(){
+  return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h10v9H3zM13 10h4l3 3v3h-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.6"/></svg>`;
+}
+
+function featuredCard(v, cloneIndex=''){
+  const sold = v.estado==='vendido';
+  const cover = v.fotos && v.fotos[0];
+  const title = [v.marca, v.modelo].filter(Boolean).join(' ');
+  const meta = [v.anio].filter(Boolean).join(' · ');
+
+  return `<article class="featured-card" data-featured-id="${esc(v.id)}" data-clone="${cloneIndex}" tabindex="0" role="button" aria-label="Ver ${esc(title)}">
+    <div class="featured-photo" style="background-image:url('${esc(cover)}')">
+      ${sold?`<span class="featured-sold"><span class="featured-sold-check">&#10003;</span> VENDIDO</span>`:''}
+      <div class="featured-photo-shade"></div>
+      <div class="featured-card-copy">
+        <strong>${esc(title)}</strong>
+        ${meta?`<span>${esc(meta)}</span>`:''}
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderFeaturedCarousel(){
+  const featured = getFeaturedVehicles();
+  if(!featured.length) return '';
+
+  const loopItems = featured.length > 1
+    ? [...featured, ...featured.slice(0, Math.min(2, featured.length))]
+    : featured;
+
+  return `<aside class="featured-panel" aria-label="Productos destacados">
+    <div class="featured-head">
+      <div class="featured-title">${featuredTruckIcon()}<span>Productos destacados</span></div>
+      <button class="featured-more" id="featuredMore" type="button">Ver más <span aria-hidden="true">&#8250;</span></button>
+    </div>
+
+    <div class="featured-carousel">
+      <div class="featured-viewport" id="featuredViewport">
+        <div class="featured-track" id="featuredTrack">
+          ${loopItems.map((v,i)=>featuredCard(v, i>=featured.length?'clone':'')).join('')}
+        </div>
+      </div>
+
+      ${featured.length>1?`
+        <button class="featured-arrow featured-prev" id="featuredPrev" type="button" aria-label="Producto anterior">&#8249;</button>
+        <button class="featured-arrow featured-next" id="featuredNext" type="button" aria-label="Producto siguiente">&#8250;</button>
+      `:''}
+    </div>
+
+    ${featured.length>1?`<div class="featured-dots">
+      ${featured.map((_,i)=>`<button type="button" class="featured-dot ${i===0?'active':''}" data-featured-dot="${i}" aria-label="Ir al producto ${i+1}"></button>`).join('')}
+    </div>`:''}
+  </aside>`;
+}
+
 function renderHero(){
   const bg = settings.hero_image_url ? `style="background-image:linear-gradient(180deg,rgba(10,17,35,0.2),rgba(10,17,35,0.5)),url('${esc(settings.hero_image_url)}')"` : '';
   const wa = waLink(null);
 
   return `<div class="hero hero-main ${settings.hero_image_url?'has-img':''}" ${bg} id="mainHero">
     <div class="wrap fade-in">
-      <div class="hero-copy">
-        <div class="hero-eyebrow">Camiones · Tractores · Semirremolques</div>
-        <h1><span>Camiones usados,</span><span class="hero-title-accent">listos para trabajar</span></h1>
-        <p class="sub">Catálogo actualizado de unidades disponibles, con financiación propia. Elegí una marca y encontrá la unidad que necesitás.</p>
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <div class="hero-eyebrow">Camiones · Tractores · Semirremolques</div>
+          <h1><span>Camiones usados,</span><span class="hero-title-accent">listos para trabajar</span></h1>
+          <p class="sub">Catálogo actualizado de unidades disponibles, con financiación propia. Elegí una marca y encontrá la unidad que necesitás.</p>
 
-        <div class="hero-actions">
-          ${settings.trailer_pdf_url?`<a href="${settings.trailer_pdf_url}" download class="hero-cta hero-cta-primary">
-            <span class="hero-action-icon">${iconDocument()}</span>
-            <span>Ver catálogo de acoplados y semis (PDF)</span>
-            <span class="hero-action-arrow" aria-hidden="true">&#8250;</span>
-          </a>`:''}
-          ${wa?`<a href="${wa}" target="_blank" rel="noopener" class="hero-cta hero-cta-secondary">
-            <span class="hero-action-icon">${iconWhatsApp()}</span>
-            <span>Consultanos<br>por WhatsApp</span>
-            <span class="hero-action-arrow" aria-hidden="true">&#8250;</span>
-          </a>`:''}
+          <div class="hero-actions">
+            ${settings.trailer_pdf_url?`<a href="${settings.trailer_pdf_url}" download class="hero-cta hero-cta-primary">
+              <span class="hero-action-icon">${iconDocument()}</span>
+              <span>Ver catálogo de acoplados y semis (PDF)</span>
+              <span class="hero-action-arrow" aria-hidden="true">&#8250;</span>
+            </a>`:''}
+
+            ${wa?`<a href="${wa}" target="_blank" rel="noopener" class="hero-cta hero-cta-secondary">
+              <span class="hero-action-icon">${iconWhatsApp()}</span>
+              <span>Consultanos<br>por WhatsApp</span>
+              <span class="hero-action-arrow" aria-hidden="true">&#8250;</span>
+            </a>`:''}
+          </div>
+
+          <div class="hero-commercial">
+            <div class="hero-commercial-item">
+              <span class="hero-commercial-icon">${iconFinance()}</span>
+              <div><strong>Financiación propia</strong><span>Opciones a tu medida.</span></div>
+            </div>
+            <span class="hero-commercial-divider"></span>
+            <div class="hero-commercial-item">
+              <span class="hero-commercial-icon">${iconSwap()}</span>
+              <div><strong>Recibimos camiones usados</strong><span>${esc(settings.frase_comercial||'En parte de pago y con financiación.')}</span></div>
+            </div>
+          </div>
         </div>
 
-        <div class="hero-commercial">
-          <div class="hero-commercial-item">
-            <span class="hero-commercial-icon">${iconFinance()}</span>
-            <div><strong>Financiación propia</strong><span>Opciones a tu medida.</span></div>
-          </div>
-          <span class="hero-commercial-divider"></span>
-          <div class="hero-commercial-item">
-            <span class="hero-commercial-icon">${iconSwap()}</span>
-            <div><strong>Recibimos camiones usados</strong><span>${esc(settings.frase_comercial||'En parte de pago y con financiación.')}</span></div>
-          </div>
-        </div>
+        ${renderFeaturedCarousel()}
       </div>
     </div>
   </div>`;
+}
+
+function initFeaturedCarousel(){
+  const featured = getFeaturedVehicles();
+  const track = document.getElementById('featuredTrack');
+  const viewport = document.getElementById('featuredViewport');
+  if(!track || !viewport || !featured.length) return;
+
+  const count = featured.length;
+  featuredCarouselIndex = 0;
+  let resetting = false;
+
+  function cardStep(){
+    const card = track.querySelector('.featured-card');
+    if(!card) return 0;
+    const styles = getComputedStyle(track);
+    const gap = parseFloat(styles.gap || styles.columnGap || '0') || 0;
+    return card.getBoundingClientRect().width + gap;
+  }
+
+  function updateDots(index){
+    const normalized = ((index % count) + count) % count;
+    document.querySelectorAll('.featured-dot').forEach((dot,i)=>{
+      dot.classList.toggle('active', i===normalized);
+    });
+  }
+
+  function moveTo(index, animate=true){
+    if(resetting) return;
+    featuredCarouselIndex = index;
+    track.style.transition = animate ? 'transform .55s cubic-bezier(.22,1,.36,1)' : 'none';
+    track.style.transform = `translate3d(${-cardStep()*index}px,0,0)`;
+    updateDots(index);
+  }
+
+  function next(){
+    if(count<2 || resetting) return;
+
+    if(featuredCarouselIndex < count-1){
+      moveTo(featuredCarouselIndex+1);
+      return;
+    }
+
+    resetting = true;
+    track.style.transition = 'transform .55s cubic-bezier(.22,1,.36,1)';
+    track.style.transform = `translate3d(${-cardStep()*count}px,0,0)`;
+    updateDots(0);
+
+    setTimeout(()=>{
+      featuredCarouselIndex = 0;
+      track.style.transition = 'none';
+      track.style.transform = 'translate3d(0,0,0)';
+      track.offsetHeight;
+      resetting = false;
+    },570);
+  }
+
+  function prev(){
+    if(count<2 || resetting) return;
+
+    if(featuredCarouselIndex > 0){
+      moveTo(featuredCarouselIndex-1);
+      return;
+    }
+
+    resetting = true;
+    featuredCarouselIndex = count;
+    track.style.transition = 'none';
+    track.style.transform = `translate3d(${-cardStep()*count}px,0,0)`;
+    track.offsetHeight;
+
+    featuredCarouselIndex = count-1;
+    track.style.transition = 'transform .55s cubic-bezier(.22,1,.36,1)';
+    track.style.transform = `translate3d(${-cardStep()*(count-1)}px,0,0)`;
+    updateDots(count-1);
+
+    setTimeout(()=>{ resetting = false; },570);
+  }
+
+  function restartAutoplay(){
+    if(featuredCarouselTimer) clearInterval(featuredCarouselTimer);
+    if(count>1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      featuredCarouselTimer = setInterval(next,4500);
+    }
+  }
+
+  document.getElementById('featuredNext')?.addEventListener('click',()=>{
+    next();
+    restartAutoplay();
+  });
+
+  document.getElementById('featuredPrev')?.addEventListener('click',()=>{
+    prev();
+    restartAutoplay();
+  });
+
+  document.querySelectorAll('.featured-dot').forEach(dot=>{
+    dot.addEventListener('click',()=>{
+      moveTo(Number(dot.dataset.featuredDot));
+      restartAutoplay();
+    });
+  });
+
+  document.querySelectorAll('.featured-card').forEach(card=>{
+    const open = ()=>{
+      const id = card.dataset.featuredId;
+      if(id) go('detail',{vehicleId:id,galleryIndex:0});
+    };
+
+    card.addEventListener('click',open);
+    card.addEventListener('keydown',e=>{
+      if(e.key==='Enter' || e.key===' '){
+        e.preventDefault();
+        open();
+      }
+    });
+  });
+
+  document.getElementById('featuredMore')?.addEventListener('click',()=>{
+    document.getElementById('catalogo')?.scrollIntoView({behavior:'smooth'});
+  });
+
+  viewport.addEventListener('mouseenter',()=>{
+    if(featuredCarouselTimer) clearInterval(featuredCarouselTimer);
+  });
+
+  viewport.addEventListener('mouseleave',restartAutoplay);
+
+  let touchX = null;
+
+  viewport.addEventListener('touchstart',e=>{
+    touchX = e.touches[0].clientX;
+    if(featuredCarouselTimer) clearInterval(featuredCarouselTimer);
+  },{passive:true});
+
+  viewport.addEventListener('touchend',e=>{
+    if(touchX!==null){
+      const dx = e.changedTouches[0].clientX-touchX;
+      if(Math.abs(dx)>40) dx<0 ? next() : prev();
+    }
+    touchX = null;
+    restartAutoplay();
+  },{passive:true});
+
+  window.addEventListener('resize',()=>{
+    if(document.getElementById('featuredTrack')) moveTo(featuredCarouselIndex,false);
+  },{passive:true});
+
+  moveTo(0,false);
+  restartAutoplay();
 }
 
 function staggerHeroTitle(text){
