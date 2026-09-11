@@ -84,7 +84,7 @@ function adjustHeroHeight(){
   const topinfo = document.querySelector('.topinfo');
   const topbar = document.querySelector('.topbar');
   const chromeH = (topinfo?topinfo.offsetHeight:0) + (topbar?topbar.offsetHeight:0);
-  const peek = window.innerWidth <= 600 ? 24 : 40;
+  const peek = 0;
   hero.style.minHeight = `calc(100svh - ${chromeH}px - ${peek}px)`;
 }
 function bindHeroResize(){
@@ -99,15 +99,26 @@ function bindHeroResize(){
 
 
 function renderTopInfo(){
-  return `<div class="topinfo"><div class="topinfo-track"><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span><span>🚛 Financiación propia</span><span>♻️ Recibimos usados</span><span>📲 Atención por WhatsApp</span></div></div>`;
+  const items = `
+    <span>&#128667; Financiación propia</span>
+    <span>&#9851;&#65039; Recibimos usados</span>
+    <span>&#128242; Atención por WhatsApp</span>
+    <span>&#128667; Financiación propia</span>
+    <span>&#9851;&#65039; Recibimos usados</span>
+    <span>&#128242; Atención por WhatsApp</span>
+  `;
+
+  return `<div class="topinfo" aria-label="Información comercial">
+    <div class="topinfo-track">
+      <div class="topinfo-group">${items}</div>
+      <div class="topinfo-group" aria-hidden="true">${items}</div>
+    </div>
+  </div>`;
 }
 function renderTopbar(){
   return `<div class="topbar"><div class="wrap">
     <div class="brand" id="logoHome" role="button" tabindex="0">${LOGO} ${BRAND_NAME}</div>
-    <div class="topbar-right">
-      <div class="topbar-cats"><span>Camiones</span><span>Semi-Tanques</span><span>Acoplados-Cerealeros</span><span>Semi-Baranda</span></div>
-      ${settings.telefono?`<span class="topbar-phone">${esc(settings.telefono)}</span>`:''}
-    </div></div></div>`;
+  </div></div>`;
 }
 function renderFloatingWA(){
   const wa = waLink(null);
@@ -123,19 +134,62 @@ function renderBody(){
   }
   return renderHero() + `<div class="wrap section" id="catalogo">${renderSearchBar()}${renderCategoryGrid()}</div>` + renderBenefits() + renderAbout();
 }
+function iconDocument(){
+  return `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5M9 12h6M9 16h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
+}
+
+function iconWhatsApp(){
+  return `<svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a8 8 0 0 0-6.9 12l-1.1 4 4.1-1.1A8 8 0 1 0 12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 8.5c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.8 1.8c.1.2 0 .4-.1.6l-.6.7c-.2.2-.1.4 0 .6.5.9 1.2 1.6 2.1 2.1.2.1.4.2.6 0l.8-.9c.2-.2.4-.2.6-.1l1.8.8c.3.1.4.3.4.5 0 .4-.2 1.4-.7 1.8-.5.4-1.2.7-2 .6-1.1-.1-2.6-.6-4.3-2.1-1.4-1.3-2.4-2.8-2.7-4-.3-1.1.1-1.9.6-2.3Z" fill="currentColor"/></svg>`;
+}
+
+function iconFinance(){
+  return `<svg width="25" height="25" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18M7 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+}
+
+function iconSwap(){
+  return `<svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7h-9a4 4 0 0 0-4 4v1M4 17h9a4 4 0 0 0 4-4v-1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="m17 4 3 3-3 3M7 14l-3 3 3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
 function renderHero(){
   const bg = settings.hero_image_url ? `style="background-image:linear-gradient(180deg,rgba(10,17,35,0.2),rgba(10,17,35,0.5)),url('${esc(settings.hero_image_url)}')"` : '';
-  const titleText = 'Camiones usados, listos para trabajar';
-  const titleHtml = heroTitleAnimated ? esc(titleText) : staggerHeroTitle(titleText);
-  heroTitleAnimated = true;
-  return `<div class="hero hero-main ${settings.hero_image_url?'has-img':''}" ${bg} id="mainHero"><div class="wrap fade-in">
-    <div class="hero-eyebrow">Camiones · Tractores · Semirremolques</div>
-    <h1>${titleHtml}</h1>
-    <p class="sub">Catálogo actualizado de unidades disponibles, con financiación propia. Elegí una marca y encontrá la unidad que necesitás.</p>
-    <div class="hero-btn-row">${settings.trailer_pdf_url?`<a href="${settings.trailer_pdf_url}" download class="hero-cta hero-cta-outline">Ver catálogo de acoplados y semis (PDF)</a>`:''}</div>
-    <div><div class="commercial-chip"><span class="spark">★</span> ${esc(settings.frase_comercial||'')}</div></div>
-  </div></div>`;
+  const wa = waLink(null);
+
+  return `<div class="hero hero-main ${settings.hero_image_url?'has-img':''}" ${bg} id="mainHero">
+    <div class="wrap fade-in">
+      <div class="hero-copy">
+        <div class="hero-eyebrow">Camiones · Tractores · Semirremolques</div>
+        <h1><span>Camiones usados,</span><span class="hero-title-accent">listos para trabajar</span></h1>
+        <p class="sub">Catálogo actualizado de unidades disponibles, con financiación propia. Elegí una marca y encontrá la unidad que necesitás.</p>
+
+        <div class="hero-actions">
+          ${settings.trailer_pdf_url?`<a href="${settings.trailer_pdf_url}" download class="hero-cta hero-cta-primary">
+            <span class="hero-action-icon">${iconDocument()}</span>
+            <span>Ver catálogo de acoplados y semis (PDF)</span>
+            <span class="hero-action-arrow" aria-hidden="true">&#8250;</span>
+          </a>`:''}
+          ${wa?`<a href="${wa}" target="_blank" rel="noopener" class="hero-cta hero-cta-secondary">
+            <span class="hero-action-icon">${iconWhatsApp()}</span>
+            <span>Consultanos<br>por WhatsApp</span>
+            <span class="hero-action-arrow" aria-hidden="true">&#8250;</span>
+          </a>`:''}
+        </div>
+
+        <div class="hero-commercial">
+          <div class="hero-commercial-item">
+            <span class="hero-commercial-icon">${iconFinance()}</span>
+            <div><strong>Financiación propia</strong><span>Opciones a tu medida.</span></div>
+          </div>
+          <span class="hero-commercial-divider"></span>
+          <div class="hero-commercial-item">
+            <span class="hero-commercial-icon">${iconSwap()}</span>
+            <div><strong>Recibimos camiones usados</strong><span>${esc(settings.frase_comercial||'En parte de pago y con financiación.')}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
+
 function staggerHeroTitle(text){
   return text.split(' ').map((w,i)=>`<span class="stagger-word"><span class="stagger-inner" style="animation-delay:${i*55}ms">${esc(w)}</span></span>`).join(' ');
 }
