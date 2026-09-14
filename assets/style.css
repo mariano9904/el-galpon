@@ -314,7 +314,8 @@
     /* search bar: stack cleanly */
     .search-bar{gap:8px;margin-bottom:20px;}
    .search-input-wrap{min-width:100%;}
-    .search-bar select{flex:1;}
+    .search-bar select{flex:1 1 calc(50% - 4px);min-width:0;padding:12px 28px 12px 14px;font-size:12px;background-position:right 12px center;}
+    .search-bar #clearFilters{width:100%;padding:11px 16px;}
 
     /* brand cards: tighter, still feel like big buttons */
     .cat-grid{gap:12px;}
@@ -698,6 +699,7 @@
 }
 
 .featured-dot.active{background:#16C9DD;}
+.featured-swipe-hint{display:none;}
 
 @media(max-width:1180px){
   .hero-layout{
@@ -721,12 +723,12 @@
 }
 
 @media(max-width:600px){
-  .featured-card{flex-basis:82%;}
+  .featured-card{flex-basis:86%;}
   .featured-panel{padding:16px 14px 14px;}
   .featured-title{font-size:16px;}
-  .featured-arrow{width:40px;height:40px;}
-  .featured-prev{left:-10px;}
-  .featured-next{right:-10px;}
+  .featured-arrow{display:none;}
+  .featured-dots{margin-top:12px;}
+  .featured-swipe-hint{display:block;margin:10px 0 0;text-align:center;color:#AAB7C8;font-family:var(--font-mono);font-size:10px;letter-spacing:.25px;}
 }
 
 @media(prefers-reduced-motion:reduce){
