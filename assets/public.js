@@ -135,13 +135,13 @@ function renderFloatingWA(){
   return `<a class="wa-float" href="${wa}" target="_blank" rel="noopener" aria-label="WhatsApp"><svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg></a>`;
 }
 function renderBody(){
-  if(state.view==='category') return renderCategoryHero() + `<div class="wrap section">${renderCategoryList()}</div>`;
+  if(state.view==='category') return renderCategoryHero() + `<section class="catalog-shell"><div class="wrap section" id="catalogo">${renderCategoryList()}</div></section>`;
   if(state.view==='detail') return `<div class="wrap section">${renderDetail()}</div>`;
   const hasFilters = !!(state.searchQuery || state.filterPrice || state.filterYear);
   if(hasFilters){
-    return renderHero() + `<div class="wrap section" id="catalogo">${renderSearchBar()}${renderSearchResults()}</div>`;
+    return renderHero() + `<section class="catalog-shell"><div class="wrap section" id="catalogo">${renderSearchBar()}${renderSearchResults()}</div></section>`;
   }
-  return renderHero() + `<div class="wrap section" id="catalogo">${renderSearchBar()}${renderCategoryGrid()}</div>` + renderBenefits() + renderAbout();
+  return renderHero() + `<section class="catalog-shell"><div class="wrap section" id="catalogo">${renderSearchBar()}${renderCategoryGrid()}</div></section>` + renderBenefits() + renderAbout();
 }
 function iconDocument(){
   return `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v5h5M9 12h6M9 16h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`;
