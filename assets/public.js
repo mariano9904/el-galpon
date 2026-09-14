@@ -216,7 +216,7 @@ function renderFeaturedCarousel(){
 
     ${featured.length>1?`<div class="featured-dots">
       ${featured.map((_,i)=>`<button type="button" class="featured-dot ${i===0?'active':''}" data-featured-dot="${i}" aria-label="Ir al producto ${i+1}"></button>`).join('')}
-    </div>`:''}
+    </div><p class="featured-swipe-hint" aria-hidden="true">Deslizá para ver más unidades</p>`:''}
   </aside>`;
 }
 
@@ -344,7 +344,8 @@ function initFeaturedCarousel(){
 
   function restartAutoplay(){
     if(featuredCarouselTimer) clearInterval(featuredCarouselTimer);
-    if(count>1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const isMobile = window.matchMedia('(max-width: 600px)').matches;
+    if(count>1 && !isMobile && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       featuredCarouselTimer = setInterval(next,4500);
     }
   }
@@ -401,7 +402,7 @@ function initFeaturedCarousel(){
   viewport.addEventListener('touchend',e=>{
     if(touchX!==null){
       const dx = e.changedTouches[0].clientX-touchX;
-      if(Math.abs(dx)>40) dx<0 ? next() : prev();
+      if(Math.abs(dx)>32) dx<0 ? next() : prev();
     }
     touchX = null;
     restartAutoplay();
