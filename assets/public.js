@@ -515,11 +515,22 @@ function renderCategoryGrid(){
   return html;
 }
 function renderCategoryHero(){
-  return `<div class="hero category-hero"><div class="wrap"><h1>${esc(state.category)}</h1></div></div>`;
+  const available = vehicles.filter(v=>v.marca===state.category && v.estado!=='vendido').length;
+  const label = available===1 ? 'unidad disponible' : `${available} unidades disponibles`;
+  return `<section class="hero category-hero">
+    <div class="wrap category-hero-inner">
+      <button class="category-back" id="backHome" type="button"><span aria-hidden="true">←</span> Todas las marcas</button>
+      <div class="category-hero-content">
+        <div class="category-eyebrow">Catálogo de vehículos</div>
+        <h1>${esc(state.category)}</h1>
+        <p>${label}</p>
+      </div>
+    </div>
+  </section>`;
 }
 function renderCategoryList(){
   const list = vehicles.filter(v=>v.marca===state.category).filter(matchesFilters);
-  let html = `<button class="backlink" id="backHome">← Volver</button>`;
+  let html = `<div class="catalog-intro"><span>Unidades disponibles</span><h2>Encontrá la unidad que necesitás</h2></div>`;
   html += renderSearchBar();
   if(list.length===0){
     const msg = (state.searchQuery||state.filterPrice||state.filterYear) ? 'No encontramos camiones con esos filtros' : 'Todavía no hay unidades cargadas en esta categoría';
