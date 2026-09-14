@@ -121,6 +121,12 @@ function renderTopInfo(){
 function renderTopbar(){
   return `<div class="topbar"><div class="wrap">
     <div class="brand" id="logoHome" role="button" tabindex="0">${LOGO} ${BRAND_NAME}</div>
+    <nav class="site-nav" aria-label="Navegación principal">
+      <button type="button" data-nav="inicio">Inicio</button>
+      <button type="button" data-nav="catalogo">Vehículos</button>
+      <button type="button" data-nav="nosotros">Nosotros</button>
+      <button type="button" data-nav="contacto">Contacto</button>
+    </nav>
   </div></div>`;
 }
 function renderFloatingWA(){
@@ -468,9 +474,31 @@ function renderBenefits(){
   </div></div>`;
 }
 function renderAbout(){
-  return `<div class="about-section"><div class="wrap about-inner fade-in"><h2>Quiénes somos</h2>
-    <p>Somos un equipo dedicado a la comercialización de camiones, tractores y semirremolques. Trabajamos con unidades seleccionadas y ofrecemos financiación propia para facilitar cada operación.</p>
-  </div></div>`;
+  return `<section class="about-section" id="nosotros" aria-labelledby="aboutTitle">
+    <div class="wrap about-layout fade-in">
+      <div class="about-copy">
+        <div class="about-eyebrow">El Galpón</div>
+        <h2 id="aboutTitle">Unidades para seguir trabajando</h2>
+        <p>Somos un equipo dedicado a la comercialización de camiones, tractores y semirremolques. Te ayudamos a encontrar una unidad que se adapte a tu trabajo y a tu operación.</p>
+        <p>Trabajamos con unidades seleccionadas, recibimos usados como parte de pago y ofrecemos financiación propia para que el proceso sea más simple.</p>
+        <button type="button" class="about-link" data-nav="contacto">Hablemos de tu próxima unidad <span aria-hidden="true">→</span></button>
+      </div>
+      <div class="about-points" aria-label="Nuestro compromiso">
+        <div class="about-point">
+          <span class="about-point-icon">${iconSwap()}</span>
+          <div><strong>Tomamos usados</strong><span>Tu camión puede ser parte de pago.</span></div>
+        </div>
+        <div class="about-point">
+          <span class="about-point-icon">${iconFinance()}</span>
+          <div><strong>Financiación propia</strong><span>Alternativas pensadas para cada operación.</span></div>
+        </div>
+        <div class="about-point">
+          <span class="about-point-icon">${iconWhatsApp()}</span>
+          <div><strong>Atención directa</strong><span>Consultanos y coordinamos sin intermediarios.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>`;
 }
 function renderCategoryGrid(){
   let html = `<div class="section-title">Buscá por marca</div><div class="section-sub">Tocá una categoría para ver los vehículos disponibles</div><div class="cat-grid">`;
@@ -555,6 +583,7 @@ function bind(){
     logoHome.addEventListener('click', ()=>go('home'));
     logoHome.addEventListener('keydown', e=>{ if(e.key==='Enter') go('home'); });
   }
+  document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click', ()=>navigateToSection(el.dataset.nav)));
   document.querySelectorAll('.cat-card').forEach(el=>{
     el.addEventListener('click', ()=>go('category',{category:el.dataset.cat}));
     el.addEventListener('keydown', e=>{ if(e.key==='Enter') go('category',{category:el.dataset.cat}); });
@@ -600,6 +629,19 @@ function bind(){
   if(filterYearEl) filterYearEl.addEventListener('change', e=>{ state.filterYear = e.target.value; render(); });
   const clearBtn = document.getElementById('clearFilters');
   if(clearBtn) clearBtn.addEventListener('click', ()=>{ state.searchQuery=''; state.filterPrice=''; state.filterYear=''; render(); });
+}
+
+function navigateToSection(section){
+  const targets = {inicio:'mainHero',catalogo:'catalogo',nosotros:'nosotros',contacto:'contacto'};
+  const targetId = targets[section];
+  if(!targetId) return;
+  const scroll = ()=>document.getElementById(targetId)?.scrollIntoView({behavior:'smooth',block:'start'});
+  if(state.view !== 'home'){
+    go('home');
+    requestAnimationFrame(scroll);
+    return;
+  }
+  scroll();
 }
 function shiftGallery(dir){
   const v = vehicles.find(t=>t.id===state.vehicleId);
