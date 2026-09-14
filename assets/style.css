@@ -922,3 +922,69 @@
   .catalog-intro h2{font-size:19px;}
 }
 /* ===== END CATEGORY CATALOG TRANSITION ===== */
+
+/* ===== CONTINUOUS DARK CATALOG ===== */
+.catalog-shell{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(680px 400px at 6% 0%,rgba(14,165,183,.12),transparent 70%),
+    radial-gradient(580px 440px at 98% 72%,rgba(25,90,142,.15),transparent 70%),
+    #0C1629;
+}
+.catalog-shell::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.24;
+  pointer-events:none;
+  background-image:linear-gradient(rgba(140,185,204,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(140,185,204,.08) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:linear-gradient(to bottom,black,transparent 74%);
+}
+.catalog-shell .wrap{position:relative;z-index:1;}
+.catalog-shell .section-title,
+.catalog-shell .catalog-intro h2{color:#F3F7FC;}
+.catalog-shell .section-sub{color:#AEBBD0;}
+.catalog-shell .catalog-intro span{color:#38D3E2;}
+
+.catalog-shell .search-bar input[type="text"],
+.catalog-shell .search-bar select{
+  color:#EEF5FB;
+  border-color:rgba(103,188,202,.34);
+  background-color:rgba(19,35,55,.86);
+  box-shadow:0 7px 18px rgba(0,0,0,.18);
+}
+.catalog-shell .search-bar input[type="text"]::placeholder{color:#A8B6C8;}
+.catalog-shell .search-input-wrap svg{color:#6CD7E2;}
+.catalog-shell .search-bar input[type="text"]:focus,
+.catalog-shell .search-bar select:focus{border-color:#29CFE0;box-shadow:0 0 0 4px rgba(30,205,222,.13),0 7px 18px rgba(0,0,0,.18);}
+.catalog-shell .search-bar select:hover{border-color:#29CFE0;}
+.catalog-shell .btn{color:#D9F9FD;background:rgba(14,165,183,.14);border-color:rgba(69,207,221,.48);}
+
+.catalog-shell .cat-card,
+.catalog-shell .veh-card{
+  border-color:rgba(100,174,191,.31);
+  background:linear-gradient(145deg,rgba(28,43,61,.96),rgba(17,29,46,.96));
+  box-shadow:0 12px 27px rgba(0,0,0,.20);
+}
+.catalog-shell .cat-card::before{background:radial-gradient(180px 120px at 50% 0%,rgba(26,208,222,.16),transparent 72%);}
+.catalog-shell .cat-card:hover,
+.catalog-shell .veh-card:hover{border-color:rgba(54,211,224,.84);box-shadow:0 17px 38px rgba(0,0,0,.32),0 0 0 1px rgba(36,204,218,.13);}
+.catalog-shell .cat-mark,
+.catalog-shell .veh-modelo,
+.catalog-shell .veh-price{color:#F5F8FC;}
+.catalog-shell .cat-count,
+.catalog-shell .veh-marca,
+.catalog-shell .veh-specs{color:#B9C7D8;}
+.catalog-shell .veh-body{background:linear-gradient(180deg,rgba(25,39,56,.99),rgba(15,27,43,.99));}
+.catalog-shell .veh-finance{color:#72E6A2;}
+.catalog-shell .empty{color:#AEBBD0;}
+.catalog-shell .empty h2{color:#F3F7FC;}
+
+@media(max-width:600px){
+  .catalog-shell::before{background-size:36px 36px;opacity:.15;}
+  .catalog-shell .search-bar input[type="text"],
+  .catalog-shell .search-bar select{background-color:rgba(22,38,58,.96);}
+}
+/* ===== END CONTINUOUS DARK CATALOG ===== */
