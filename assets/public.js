@@ -639,6 +639,7 @@ function bind(){
     logoHome.addEventListener('keydown', e=>{ if(e.key==='Enter') go('home'); });
   }
   document.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click', ()=>navigateToSection(el.dataset.nav)));
+  bindAnalyticsEvents();
   document.querySelectorAll('.cat-card').forEach(el=>{
     el.addEventListener('click', ()=>go('category',{category:el.dataset.cat}));
     el.addEventListener('keydown', e=>{ if(e.key==='Enter') go('category',{category:el.dataset.cat}); });
@@ -684,6 +685,20 @@ function bind(){
   if(filterYearEl) filterYearEl.addEventListener('change', e=>{ state.filterYear = e.target.value; render(); });
   const clearBtn = document.getElementById('clearFilters');
   if(clearBtn) clearBtn.addEventListener('click', ()=>{ state.searchQuery=''; state.filterPrice=''; state.filterYear=''; render(); });
+}
+
+function bindAnalyticsEvents(){
+  if(typeof window.gtag!=='function') return;
+  document.querySelectorAll('a[href*="wa.me"]').forEach(link=>link.addEventListener('click',()=>{
+    const vehicle = state.vehicleId ? vehicles.find(v=>v.id===state.vehicleId) : null;
+    window.gtag('event','whatsapp_click',{
+      link_location: link.className || 'whatsapp',
+      vehicle: vehicle ? `${vehicle.marca} ${vehicle.modelo}` : 'general'
+    });
+  }));
+  document.querySelectorAll('a[download]').forEach(link=>link.addEventListener('click',()=>{
+    window.gtag('event','catalog_pdf_click',{file_name:link.getAttribute('href')||'catalogo'});
+  }));
 }
 
 function navigateToSection(section){
