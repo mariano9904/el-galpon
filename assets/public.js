@@ -78,8 +78,51 @@ function render(){
   if(featuredCarouselTimer){ clearInterval(featuredCarouselTimer); featuredCarouselTimer = null; }
   const app = document.getElementById('app');
   app.innerHTML = renderTopInfo() + renderTopbar() + renderBody() + renderContact() + renderFooter() + renderFloatingWA();
+  updateSeo();
   bind();
   if(state.view==='home'){ adjustHeroHeight(); bindHeroResize(); initFeaturedCarousel(); }
+}
+function upsertMeta(attribute, value, content){
+  let el = document.head.querySelector(`meta[${attribute}="${value}"]`);
+  if(!el){ el = document.createElement('meta'); el.setAttribute(attribute,value); document.head.appendChild(el); }
+  el.setAttribute('content',content);
+}
+function updateSeo(){
+  const homeTitle = 'El Galpón — Camiones usados listos para trabajar';
+  let title = homeTitle;
+  let description = 'El Galpón: catálogo de camiones usados, tractores y semirremolques en General Pico, La Pampa. Consultá unidades, financiación propia y recepción de usados por WhatsApp.';
+  const current = state.vehicleId ? vehicles.find(v=>v.id===state.vehicleId) : null;
+  if(state.view==='category' && state.category){
+    title = `Camiones ${state.category} usados — El Galpón`;
+    description = `Camiones ${state.category} usados disponibles en El Galpón. Consultá modelos, años, fotos y financiación propia por WhatsApp.`;
+  } else if(state.view==='detail' && current){
+    title = `${current.marca} ${current.modelo} usado — El Galpón`;
+    description = `Mirá las fotos y características del ${current.marca} ${current.modelo}${current.anio?` modelo ${current.anio}`:''}. Consultá precio y financiación en El Galpón.`;
+  }
+  document.title = title;
+  upsertMeta('name','description',description);
+  upsertMeta('property','og:title',title);
+  upsertMeta('property','og:description',description);
+  upsertMeta('name','twitter:title',title);
+  upsertMeta('name','twitter:description',description);
+  const oldSchema = document.getElementById('dynamicProductSchema');
+  if(oldSchema) oldSchema.remove();
+  if(state.view==='detail' && current){
+    const schema = {
+      '@context':'https://schema.org', '@type':'Product',
+      name:`${current.marca} ${current.modelo}`,
+      description: current.descripcion || description,
+      brand:{'@type':'Brand',name:current.marca},
+      image:Array.isArray(current.fotos) ? current.fotos.filter(Boolean) : []
+    };
+    if(current.precio!=='' && current.precio!=null && !isNaN(Number(current.precio))) schema.offers={
+      '@type':'Offer', price:Number(current.precio), priceCurrency:'USD', availability:current.estado==='vendido'?'https://schema.org/SoldOut':'https://schema.org/InStock', url:'https://www.elgalponcamiones.com/'
+    };
+    const script = document.createElement('script');
+    script.id = 'dynamicProductSchema'; script.type='application/ld+json';
+    script.textContent = JSON.stringify(schema).replace(/</g,'\\u003c');
+    document.head.appendChild(script);
+  }
 }
 function adjustHeroHeight(){
   const hero = document.getElementById('mainHero');
@@ -176,7 +219,7 @@ function featuredCard(v, cloneIndex=''){
   const meta = [v.anio].filter(Boolean).join(' · ');
 
   return `<article class="featured-card" data-featured-id="${esc(v.id)}" data-clone="${cloneIndex}" tabindex="0" role="button" aria-label="Ver ${esc(title)}">
-    <div class="featured-photo" style="background-image:url('${esc(cover)}')">
+    <div class="featured-photo" role="img" aria-label="${esc(title)}" style="background-image:url('${esc(cover)}')">
       ${sold?`<span class="featured-sold"><span class="featured-sold-check">&#10003;</span> VENDIDO</span>`:''}
       <div class="featured-photo-shade"></div>
       <div class="featured-card-copy">
@@ -445,7 +488,7 @@ function renderVehCard(v){
   const sold = v.estado==='vendido';
   const cover = v.fotos && v.fotos[0];
   return `<div class="veh-card" data-id="${v.id}">
-    <div class="veh-photo ${sold?'sold':''}">
+    <div class="veh-photo ${sold?'sold':''}" role="img" aria-label="Foto de ${esc(v.marca)} ${esc(v.modelo)}">
       ${cover?`<div class="photo-bg" style="background-image:url('${esc(cover)}')"></div>`:`<div class="noimg">Sin foto</div>`}
       <div class="badge ${sold?'vendido':'disponible'}">${sold?'VENDIDO':'DISPONIBLE'}</div>
     </div>
@@ -506,7 +549,7 @@ function renderCategoryGrid(){
   brands.forEach(b=>{
     const isTrailer = b.nombre.startsWith('Semirremolques');
     html += `<div class="cat-card ${isTrailer?'trailer':''}" data-cat="${esc(b.nombre)}" tabindex="0" role="button">
-      <div class="cat-media">${b.logo_url?`<div class="logo-bg" style="background-image:url('${esc(b.logo_url)}')"></div>`:FALLBACK_ICON}</div>
+      <div class="cat-media">${b.logo_url?`<img class="logo-image" src="${esc(b.logo_url)}" alt="Logo ${esc(b.nombre)}" loading="lazy">`:FALLBACK_ICON}</div>
       <div class="cat-mark">${esc(b.nombre)}</div>
       <div class="cat-count">${catCount(b.nombre)} publicados</div>
     </div>`;
