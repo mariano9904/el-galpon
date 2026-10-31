@@ -126,8 +126,9 @@
   .cat-card:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
   .cat-media{height:56px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;position:relative;}
   .cat-media .logo-bg{max-height:56px;transition:transform 0.22s ease;}
+  .cat-media .logo-image{display:block;width:100%;height:56px;object-fit:contain;transition:transform 0.22s ease,filter 0.22s ease;}
   .cat-media svg{opacity:0.9;}
-  .cat-card:hover .cat-media .logo-bg{transform:scale(1.06);}
+  .cat-card:hover .cat-media .logo-bg,.cat-card:hover .cat-media .logo-image{transform:scale(1.06);}
   .cat-mark{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--navy);margin-bottom:5px;letter-spacing:-0.1px;position:relative;z-index:2;}
   .cat-count{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.6px;position:relative;z-index:2;}
   .cat-card.trailer .cat-mark{font-size:14.5px;}
